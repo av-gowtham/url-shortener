@@ -1,7 +1,42 @@
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
+import AppLayout from "./layouts/AppLayout";
+import Landing from "./pages/Landing";
+import Auth from "./pages/auth";
+import Dashboard from "./pages/dashboard";
+import Link from "./pages/link";
+import RedirectLink from "./pages/redirect-link";
+
+const router = createBrowserRouter([
+    {
+        element: <AppLayout />,
+        children: [
+            {
+                path: "/",
+                element: <Landing />,
+            },
+            {
+                path: "/auth",
+                element: <Auth />,
+            },
+            {
+                path: "/dashboard",
+                element: <Dashboard />,
+            },
+            {
+                path: "/link/:id",
+                element: <Link />,
+            },
+            {
+                path: "/:id",
+                element: <RedirectLink />,
+            },
+        ],
+    },
+]);
 
 function App() {
-    return <div className="text-2xl p-4">Hello! World</div>;
+    return <RouterProvider router={router} />;
 }
 
 export default App;
