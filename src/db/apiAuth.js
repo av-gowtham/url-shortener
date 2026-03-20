@@ -17,9 +17,10 @@ export async function getCurrentUser() {
 }
 
 export async function signup({ name, email, password, profile_pic }) {
-    const fileName = `dp-${name.split("").join("-")}-${Math.random()}`;
+    const ext = profile_pic.name.split(".").pop();
+    const fileName = `dp-${name.split("").join("-")}-${Date.now()}.${ext}`;
 
-    const { error: storageError } = await supabase.storage.from("public_pic").upload(fileName, profile_pic);
+    const { error: storageError } = await supabase.storage.from("profile_pic").upload(fileName, profile_pic);
 
     if (storageError) throw new Error(storageError.message);
 
@@ -29,7 +30,7 @@ export async function signup({ name, email, password, profile_pic }) {
         options: {
             data: {
                 name,
-                profile_pic: `${supabaseUrl}/storage/v1/object/public/public_pic/${fileName}`,
+                profile_pic: `${supabaseUrl}/storage/v1/object/public/profile_pic/${fileName}`,
             },
         },
     });
@@ -37,4 +38,9 @@ export async function signup({ name, email, password, profile_pic }) {
     if (signUpError) throw new Error(signUpError);
 
     return data;
+}
+
+export async function logout() {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw new Error(error.message);
 }

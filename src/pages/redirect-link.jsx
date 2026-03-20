@@ -1,5 +1,5 @@
 const RedirectLink = () => {
-    return <div>RedirectLink</div>;
+    return <div>RedirectLink asd</div>;
 };
 
 export default RedirectLink;

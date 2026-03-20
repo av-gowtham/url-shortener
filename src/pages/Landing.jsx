@@ -2,15 +2,53 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
 
 const Landing = () => {
     const [longUrl, setLongUrl] = useState();
+    const [error, setError] = useState({});
     const navigate = useNavigate();
 
-    const handleShorten = (e) => {
+    const handleShorten = async (e) => {
         e.preventDefault();
 
-        if (longUrl) navigate(`/auth?createNew=${longUrl}`);
+        setError({}); // clear previous errors
+
+        const normalizeUrl = (value) => {
+            if (!value) return value;
+            if (!/^https?:\/\//i.test(value)) {
+                return "https://" + value;
+            }
+            return value;
+        };
+
+        try {
+            const schema = Yup.object({
+                longUrl: Yup.string()
+                    .required("URL is required")
+                    .transform(normalizeUrl)
+                    .test("is-valid-url", "Invalid URL", (value) => {
+                        try {
+                            new URL(value);
+                            return true;
+                        } catch {
+                            return false;
+                        }
+                    }),
+            });
+
+            await schema.validate({ longUrl }, { abortEarly: false });
+
+            const normalized = normalizeUrl(longUrl);
+
+            navigate(`/auth?createNew=${normalized}`);
+        } catch (e) {
+            const newErrors = {};
+            e?.inner?.forEach((err) => {
+                newErrors[err.path] = err.message;
+            });
+            setError(newErrors);
+        }
     };
 
     return (
@@ -25,7 +63,7 @@ const Landing = () => {
                     Shorten!
                 </Button>
             </form>
-
+            {error?.longUrl && <p className="text-red-600 mt-4">{error.longUrl}</p>}
             <img src="./banner.png" alt="banner" className="w-full my-11 md:px-11" />
         </div>
     );

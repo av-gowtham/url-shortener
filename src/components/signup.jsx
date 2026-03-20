@@ -24,11 +24,12 @@ const Login = () => {
     const longLink = searchParams.get("createNew");
 
     const handleInputChange = (e) => {
-        const { name, value, file } = e.target;
+        const { name, value, files } = e.target;
+        console.log(e.target);
 
         setFormData((prevState) => ({
             ...prevState,
-            [name]: file ? file[0] : value,
+            [name]: files ? files[0] : value,
         }));
     };
 
